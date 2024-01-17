@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using MVVM.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using WpfTracker.Models;
 
-namespace WpfTracker.Readers
+namespace MVVM.Readers
 {
     /// <summary>
     /// File reader.
@@ -13,20 +13,20 @@ namespace WpfTracker.Readers
         /// Read all files from given directory and get list of objects.
         /// </summary>
         /// <param name="targetDirectory">Target directory.</param>
-        /// <returns>A <see cref="Task{IDictionary{int,IList{UserInformationForADay}}}">.</returns>
-        Task<IDictionary<int, IList<UserInformationForADay>>> ReadDirectory(string targetDirectory = null);
+        /// <returns>A <see cref="Task{IDictionary{int,IList{Currency}}}">.</returns>
+        Task<IDictionary<int, IList<Currency>>> ReadDirectory(string targetDirectory = null);
 
         /// <summary>
         /// Read all files and get list of objects.
         /// </summary>
         /// <param name="files">Files.</param>
-        /// <returns>A <see cref="Task{IDictionary{int,IList{UserInformationForADay}}}">.</returns>
-        Task<IDictionary<int, IList<UserInformationForADay>>> ReadFiles(string[] files);
+        /// <returns>A <see cref="Task{IDictionary{int,IList{Currency}}}">.</returns>
+        Task<IDictionary<int, IList<Currency>>> ReadFiles(string[] files);
 
         /// <summary>
         /// Read file and get list of objects.
         /// </summary>
-        /// <returns>A <see cref="Task{IList{UserInformationForADay}}">.</returns>
-        Task<IList<UserInformationForADay>> ReadFile(string path);
+        /// <returns>A <see cref="Task{IList{Currency}}">.</returns>
+        Task<IList<Currency>> ReadFile(string path);
     }
 }

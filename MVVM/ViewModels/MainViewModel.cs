@@ -1,8 +1,11 @@
-﻿using LiveCharts;
+﻿using bntu.vsrpp.AHotko.Core;
+using LiveCharts;
 using LiveCharts.Configurations;
 using MVVM.AsyncCommand;
+using MVVM.Helpers;
 using MVVM.Models;
 using MVVM.Services;
+using MVVM.Writers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +23,7 @@ namespace MVVM.ViewModels
         private readonly IDialogService _dialogService;
         private Currency _selectedCurrency;
         private NotifyTaskCompletion<IList<Currency>> _currencies;
-        private ChartValues<decimal> _selectedCurrencyCurOfficialRate;
+        private ChartValues<decimal?> _selectedCurrencyCurOfficialRate;
         private ChartValues<DateTime> _date;
 
         private AsyncCommand<NotifyTaskCompletion<IList<Currency>>> _openCommand;
@@ -46,11 +49,15 @@ namespace MVVM.ViewModels
                 _selectedCurrency = value;
                 if (_selectedCurrency != null)
                 {
-                    //отображение на графике текущего курса
-                    /*var selectedUserSteps = _selectedUser.UserData.Select(u => (u.Value.Steps));
-                    SelectedUserSteps = new ChartValues<int>(selectedUserSteps);
-                    var days = _selectedUser.UserData.Select(u => (u.Key));
-                    Days = new ChartValues<int>(days);*/
+                    //отображение на графике текущего курса                    
+                    var model = DynamicsCurrencyProcessor.LoadDynamicsCurrency(_selectedCurrency.Cur_ID, DateOnly.ParseExact("31/01/2023", "dd/MM/yyyy"), DateOnly.ParseExact("17/01/2024", "dd/MM/yyyy"));
+
+                    RateShorts = new NotifyTaskCompletion<IList<RateShort>>(model);
+                    if (RateShorts.IsCompleted)
+                    {
+                        SelectedCurrencyCurOfficialRate = new ChartValues<decimal?>(RateShorts.Result.Select(u => (u.Cur_OfficialRate)));
+                        Date = new ChartValues<DateTime>(RateShorts.Result.Select(u => (u.Date)));
+                    }
                 }
                 else
                 {
@@ -60,17 +67,17 @@ namespace MVVM.ViewModels
             }
         }
 
-        public ChartValues<decimal> SelectedCurrencyCurOfficialRate
+        public ChartValues<decimal?> SelectedCurrencyCurOfficialRate
         {
             get { return _selectedCurrencyCurOfficialRate; }
             set
             {
-                _selectedCurrencyCurOfficialRate = value;
+                _selectedCurrencyCurOfficialRate = value;                
 
                 // color the minimum and maximum points of the selected cur rate graph
                 if (value != null)
                 {
-                    ColorMinAndMaxPoint();
+                    //ColorMinAndMaxPoint();
                 }
 
                 OnPropertyChanged(nameof(SelectedCurrencyCurOfficialRate));
@@ -88,16 +95,17 @@ namespace MVVM.ViewModels
         }
         #endregion
 
-        public MainViewModel(IFileService fileService, IDialogService dialogService)
+        public MainViewModel(IFileService fileService, IDialogService dialogService, Task<IList<Currency>> currencies)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
-            Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetUsersStatistic());
+            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetUsersStatistic());
+            Currencies = new NotifyTaskCompletion<IList<Currency>>(currencies);
         }
 
         #region open files command
-        public AsyncCommand<NotifyTaskCompletion<IList<User>>> OpenCommand
+        public AsyncCommand<NotifyTaskCompletion<IList<Currency>>> OpenCommand
         {
             get
             {
@@ -107,7 +115,7 @@ namespace MVVM.ViewModels
                     {
                         if (_dialogService.OpenFileDialog() == true)
                         {
-                            Users = new NotifyTaskCompletion<IList<User>>(_fileService.GetUsersStatistic(_dialogService.FilePaths));
+                            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic(_dialogService.FilePaths));
                             _dialogService.ShowMessage("Файлы открыты");
                         }
                     }
@@ -120,12 +128,12 @@ namespace MVVM.ViewModels
         }
         #endregion
 
-        #region save User command
+        #region save Currency command
         public AsyncCommand<Currency> SaveCommand
         {
             get
             {
-                return _saveCommand ??= new AsyncCommand<Currency>(async (user) =>
+                return _saveCommand ??= new AsyncCommand<Currency>(async (currency) =>
                 {
                     try
                     {
@@ -135,15 +143,15 @@ namespace MVVM.ViewModels
                             using StreamWriter writer = new StreamWriter(File.Create(_dialogService.FilePath));
                             switch (fileExtension)
                             {
-                                case ".xml":
-                                    await new UserXmlWriter(writer).Write(user);
-                                    break;
+                                /*case ".xml":
+                                    await new UserXmlWriter(writer).Write(currency);
+                                    break;*/
                                 case ".json":
-                                    await new UserJsonWriter(writer).Write(user);
+                                    await new CurrencyJsonWriter(writer).Write(currency);
                                     break;
-                                case ".csv":
-                                    await new UserCsvWriter(writer).Write(user);
-                                    break;
+                                /*case ".csv":
+                                    await new UserCsvWriter(writer).Write(currency);
+                                    break;*/
                                 default:
                                     throw new FileFormatException("Неподдерживаемый формат файла");
                             }

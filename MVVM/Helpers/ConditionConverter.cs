@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace WpfTracker.Helpers
+namespace MVVM.Helpers
 {
     public class ConditionConverter : IMultiValueConverter
     {

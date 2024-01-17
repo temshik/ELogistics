@@ -1,9 +1,8 @@
 ﻿using MVVM.Models;
+using MVVM.Readers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using WpfTracker.Readers;
 
 namespace MVVM.Services
 {
@@ -28,31 +27,31 @@ namespace MVVM.Services
         /// Get all Currency statictic.
         /// </summary>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
-        public async Task<IList<Currency>> GetCurrencyStatistic()
+        /*public async Task<IList<Currency>> GetCurrencyStatistic()
         {
             var allStatistic = await _fileReader.ReadDirectory();
             return GetUsers(allStatistic);
-        }
+        }*/
 
         /// <summary>
         /// Get all Currency statictic.
         /// </summary>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
-        public async Task<IList<Currency>> GetCurrencyStatistic(string[] files)
+        /*public async Task<IList<Currency>> GetCurrencyStatistic(string[] files)
         {
             var allStatistic = await _fileReader.ReadFiles(files);
             return GetUsers(allStatistic);
-        }
+        }*/
 
-        private static IList<Currency> GetCurrency(IDictionary<int, IList<UserInformationForADay>> allStatistic)
+        private static IList<Currency> GetCurrency(IDictionary<int, IList<Currency>> allStatistic)
         {
-            var users = new List<User>();
+            var users = new List<Currency>();
 
-            var usersData = new List<User>();
+            var usersData = new List<Currency>();
 
-            foreach (var day in allStatistic)
+ /*           foreach (var day in allStatistic)
             {
-                foreach (UserInformationForADay data in day.Value)
+                foreach (Currency data in day.Value)
                 {
                     var existedUsers = users.Where(u => u.UserName == data.User).ToList();
                     User user = null;
@@ -61,7 +60,7 @@ namespace MVVM.Services
                         user = new User
                         {
                             UserName = data.User,
-                            UserData = new Dictionary<int, UserInformationForADay>()
+                            UserData = new Dictionary<int, Currency>()
                         };
                         user.UserData.Add(day.Key, data);
                         users.Add(user);
@@ -72,14 +71,14 @@ namespace MVVM.Services
                         user.UserData.Add(day.Key, data);
                     }
                 }
-            }
+            }*/
 
-            GetTheAverageMaximumAndMinimumResults(users);
+            //GetTheAverageMaximumAndMinimumResults(users);
 
             return users;
         }
 
-        private static void GetTheAverageMaximumAndMinimumResults(List<User> users)
+/*        private static void GetTheAverageMaximumAndMinimumResults(List<Currency> users)
         {
             foreach (var user in users)
             {
@@ -88,6 +87,6 @@ namespace MVVM.Services
                 user.TheBestResult = steps.Max();
                 user.TheWorstResult = steps.Min();
             }
-        }
+        }*/
     }
 }

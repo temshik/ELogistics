@@ -3,10 +3,110 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MVVM"
+        xmlns:local="clr-namespace:MVVM" xmlns:sc="clr-namespace:MVVM.Helpers" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1200">
+    <Window.Resources>
+        <!--<sc:ConditionConverter x:Key="conditionConverter"/>-->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="AccessText">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.6*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.ColumnSpan="2" >
+            <MenuItem Header="Меню">
+                <MenuItem Header="Сохранить" Command="{Binding SaveCommand}" CommandParameter="{Binding SelectedCurrency}" />
+                <MenuItem Header="Открыть" Command="{Binding OpenCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <TextBlock Grid.Column="0" Grid.Row="1">
+        Список поддреживаемых валют
+        </TextBlock>
+
+        <TextBlock Grid.Column="1" Grid.Row="1">
+        График по выбранной валюте
+        </TextBlock>
+
+        <ListView Grid.Column="0" Grid.Row="2"
+              Margin="5,0,0,0"
+              ItemsSource="{Binding Currencies.Result}"
+              SelectedItem="{Binding SelectedCurrency}"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top" Width="435">
+            <!--<ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="True">
+                                    <Condition.Binding>
+                                        <MultiBinding Converter="{StaticResource conditionConverter}">
+                                            -->
+            <!-- the best or worst results differ from the average number
+                                        of steps for the entire period (for this user) by more than 20% -->
+            <!--<Binding Path="AverageStepsNumber" />
+                                            <Binding Path="TheBestResult" />
+                                            <Binding Path="TheWorstResult" />-->
+            <!--
+                                        </MultiBinding>
+                                    </Condition.Binding>
+                                </Condition>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Background" Value="#7FFFD4" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>-->
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Code}" Width="50">
+                        <AccessText Text="Код валюты" />
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Abbreviation}" Width="50">
+                        <AccessText Text="Буквенный код" />
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Name}" Width="auto">
+                        <AccessText Text="Наименование валюты" />
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_DateEnd}" Width="auto">
+                        <AccessText Text="Дата завершения поддержки" />
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <lvc:CartesianChart Grid.Column="1" Grid.Row="2"
+                        Margin="5 0 5 5"
+                        DisableAnimations="True">
+            <lvc:CartesianChart.Series>
+                <lvc:LineSeries Values="{Binding SelectedCurrencyCurOfficialRate}" />
+            </lvc:CartesianChart.Series>
+            <lvc:CartesianChart.AxisY>
+                <lvc:Axis Title="Курс" Labels="{Binding Date}" MinValue="0"></lvc:Axis>
+            </lvc:CartesianChart.AxisY>
+            <lvc:CartesianChart.AxisX>
+                <lvc:Axis Title="Дни"></lvc:Axis>
+            </lvc:CartesianChart.AxisX>
+        </lvc:CartesianChart>
 
     </Grid>
 </Window>

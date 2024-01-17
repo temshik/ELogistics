@@ -1,20 +1,26 @@
-﻿using System.Collections.ObjectModel;
-using bntu.vsrpp.AHotko.Core.Model;
+﻿using MVVM.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
-namespace bntu.vsrpp.AHotko.Core
+namespace MVVM.Helpers
 {
     public class CurrencyProcessor
     {
-        public static async Task<ObservableCollection<Currency>> LoadCurrencies()
+        public static async Task<IList<Currency>> LoadCurrencies()
         {
-            string url = "https://api.nbrb.by/exrates/currencies";
-
+            string url = "https://api.nbrb.by/exrates/currencies";          
+            
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    ObservableCollection<Currency> currencies = await response.Content.ReadAsAsync<ObservableCollection<Currency>>();
-                    return currencies;
+                    var currencies = await response.Content.ReadFromJsonAsync<IList<Currency>>();
+                    return currencies.Where(i => i.Cur_DateStart <= DateTime.Today &&
+                                                 i.Cur_DateEnd > DateTime.Today).ToList();
                 }
                 else
                 {

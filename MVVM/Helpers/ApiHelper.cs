@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
 
-namespace bntu.vsrpp.AHotko.Core
+namespace MVVM.Helpers
 {
     public static class ApiHelper
     {

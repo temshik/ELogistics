@@ -1,6 +1,11 @@
-﻿using bntu.vsrpp.AHotko.Core.Model;
+﻿using MVVM.Models;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
-namespace bntu.vsrpp.AHotko.Core
+namespace MVVM.Helpers
 {
     public class DayCurrencyProcessor
     {
@@ -20,7 +25,7 @@ namespace bntu.vsrpp.AHotko.Core
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    List<Rate> rates = await response.Content.ReadAsAsync<List<Rate>>();
+                    List<Rate> rates = await response.Content.ReadFromJsonAsync<List<Rate>>();
                     return rates;
                 }
                 else

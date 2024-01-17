@@ -1,5 +1,9 @@
-﻿using MVVM.Services;
+﻿using MVVM.Helpers;
+using MVVM.Models;
+using MVVM.Services;
 using MVVM.ViewModels;
+using System;
+using System.Linq;
 using System.Windows;
 
 namespace MVVM
@@ -12,8 +16,9 @@ namespace MVVM
         public MainWindow(IFileService fileService, IDialogService dialogService)
         {
             InitializeComponent();
+            ApiHelper.InitializeClient();
 
-            DataContext = new MainViewModel(fileService, dialogService);
+            DataContext = new MainViewModel(fileService, dialogService, CurrencyProcessor.LoadCurrencies());
         }
     }
 }

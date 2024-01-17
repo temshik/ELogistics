@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MVVM.ErrorHandler;
+using MVVM.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,10 +7,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using WpfTracker.ErrorHandler;
-using WpfTracker.Models;
 
-namespace WpfTracker.Readers
+namespace MVVM.Readers
 {
     /// <summary>
     /// JSON file reader.
@@ -27,7 +26,7 @@ namespace WpfTracker.Readers
         public JsonFileReader(IErrorHandler errorHandler, string directory)
         {
             _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
-            _directory = directory ?? throw new ArgumentNullException(nameof(directory));
+            _directory = directory;// ?? throw new ArgumentNullException(nameof(directory));
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace WpfTracker.Readers
         ///     A <see cref="Task{IDictionary{int,IList{UserInformationForADay}}}">.
         ///     Returns a dictionary where the key is the number of the day and the value is information about the users on that day.
         /// </returns>
-        public async Task<IDictionary<int, IList<UserInformationForADay>>> ReadDirectory(string targetDirectory = null)
+        public async Task<IDictionary<int, IList<Currency>>> ReadDirectory(string targetDirectory = null)
         {
             if (targetDirectory == null)
             {
@@ -47,7 +46,7 @@ namespace WpfTracker.Readers
 
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
-            IDictionary<int, IList<UserInformationForADay>> allStatistic = await ReadFiles(fileEntries);
+            IDictionary<int, IList<Currency>> allStatistic = await ReadFiles(fileEntries);
 
             // Recurse into subdirectories of this directory.
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
@@ -57,9 +56,9 @@ namespace WpfTracker.Readers
             return allStatistic;
         }
 
-        public async Task<IDictionary<int, IList<UserInformationForADay>>> ReadFiles(string[] files)
+        public async Task<IDictionary<int, IList<Currency>>> ReadFiles(string[] files)
         {
-            var allStatistic = new Dictionary<int, IList<UserInformationForADay>>();
+            var allStatistic = new Dictionary<int, IList<Currency>>();
             foreach (string fileName in files)
             {
                 // Only files with format name 'day1', 'day15', ...  are accepted
@@ -87,15 +86,15 @@ namespace WpfTracker.Readers
         /// </summary>
         /// <param name="path">JSON file path.</param>
         /// <returns>
-        ///     A <see cref="Task{IList{UserInformationForADay}}">.
+        ///     A <see cref="Task{IList{Currency}}">.
         ///     Returns a list with the information about the users on the day.
         /// </returns>
-        public async Task<IList<UserInformationForADay>> ReadFile(string path)
+        public async Task<IList<Currency>> ReadFile(string path)
         {
             using FileStream fs = File.OpenRead(path);
             var serializerOptions = new JsonSerializerOptions();
             serializerOptions.Converters.Add(new JsonStringEnumConverter { });
-            return await JsonSerializer.DeserializeAsync<IList<UserInformationForADay>>(fs, serializerOptions);
+            return await JsonSerializer.DeserializeAsync<IList<Currency>>(fs, serializerOptions);
         }
     }
 }
