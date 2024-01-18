@@ -14,14 +14,14 @@ namespace MVVM.Readers
         /// </summary>
         /// <param name="targetDirectory">Target directory.</param>
         /// <returns>A <see cref="Task{IDictionary{int,IList{Currency}}}">.</returns>
-        Task<IDictionary<int, IList<Currency>>> ReadDirectory(string targetDirectory = null);
+        Task<IList<Currency>> ReadDirectory(string targetDirectory = null);
 
         /// <summary>
         /// Read all files and get list of objects.
         /// </summary>
         /// <param name="files">Files.</param>
         /// <returns>A <see cref="Task{IDictionary{int,IList{Currency}}}">.</returns>
-        Task<IDictionary<int, IList<Currency>>> ReadFiles(string[] files);
+        Task<IList<Currency>> ReadFiles(string[] files);
 
         /// <summary>
         /// Read file and get list of objects.

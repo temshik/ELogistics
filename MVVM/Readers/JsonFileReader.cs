@@ -34,10 +34,10 @@ namespace MVVM.Readers
         /// </summary>
         /// <param name="path">JSON file path.</param>
         /// <returns>
-        ///     A <see cref="Task{IDictionary{int,IList{UserInformationForADay}}}">.
+        ///     A <see cref="Task{IList{Currency}}">.
         ///     Returns a dictionary where the key is the number of the day and the value is information about the users on that day.
         /// </returns>
-        public async Task<IDictionary<int, IList<Currency>>> ReadDirectory(string targetDirectory = null)
+        public async Task<IList<Currency>> ReadDirectory(string targetDirectory = null)
         {
             if (targetDirectory == null)
             {
@@ -46,7 +46,7 @@ namespace MVVM.Readers
 
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
-            IDictionary<int, IList<Currency>> allStatistic = await ReadFiles(fileEntries);
+            IList<Currency> allStatistic = await ReadFiles(fileEntries);
 
             // Recurse into subdirectories of this directory.
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
@@ -56,21 +56,15 @@ namespace MVVM.Readers
             return allStatistic;
         }
 
-        public async Task<IDictionary<int, IList<Currency>>> ReadFiles(string[] files)
+        public async Task<IList<Currency>> ReadFiles(string[] files)
         {
-            var allStatistic = new Dictionary<int, IList<Currency>>();
+            var allStatistic = new List<Currency>();
             foreach (string fileName in files)
-            {
-                // Only files with format name 'day1', 'day15', ...  are accepted
-                if (!int.TryParse(Regex.Match(fileName, "\\d+").Value, out int dayNumber))
-                {
-                    continue;
-                }
-
+            { 
                 try
                 {
                     var dayStatistic = await ReadFile(fileName);
-                    allStatistic.Add(dayNumber, dayStatistic);
+                    allStatistic.AddRange(dayStatistic);
                 }
                 catch (JsonException jsonex)
                 {

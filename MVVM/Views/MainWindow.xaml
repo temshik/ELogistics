@@ -3,9 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MVVM" xmlns:sc="clr-namespace:MVVM.Helpers" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:sc="clr-namespace:MVVM.Helpers"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        xmlns:viewmodels="clr-namespace:MVVM.ViewModels"
+        xmlns:local="clr-namespace:MVVM" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200">
+        Title="MainWindow" Height="720" Width="1366">
     <Window.Resources>
         <!--<sc:ConditionConverter x:Key="conditionConverter"/>-->
         <Style TargetType="TextBlock">
@@ -22,8 +27,9 @@
     <Grid>
 
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.7*" />
             <ColumnDefinition Width="0.6*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />
@@ -31,28 +37,31 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Menu Grid.ColumnSpan="2" >
+        <Menu Grid.ColumnSpan="3" >
             <MenuItem Header="Меню">
                 <MenuItem Header="Сохранить" Command="{Binding SaveCommand}" CommandParameter="{Binding SelectedCurrency}" />
                 <MenuItem Header="Открыть" Command="{Binding OpenCommand}" />
             </MenuItem>
         </Menu>
 
-        <TextBlock Grid.Column="0" Grid.Row="1">
+        <TextBlock Grid.Column="0" Grid.Row="1" Height="18" Margin="5,0,4,0">
         Список поддреживаемых валют
         </TextBlock>
 
-        <TextBlock Grid.Column="1" Grid.Row="1">
+        <TextBlock Grid.Column="2" Grid.Row="1" Height="18" Margin="5,0,5,0">
         График по выбранной валюте
         </TextBlock>
 
-        <ListView Grid.Column="0" Grid.Row="2"
-              Margin="5,0,0,0"
-              ItemsSource="{Binding Currencies.Result}"
-              SelectedItem="{Binding SelectedCurrency}"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Top" Width="435">
-            <!--<ListView.ItemContainerStyle>
+        <TextBlock Grid.Column="1" Grid.Row="1" Height="18" Margin="5,0,5,0">
+        Выбранный элемент
+        </TextBlock>
+
+        <!--<ListView Grid.Row="2"
+            ItemsSource="{Binding Currencies.Result}"
+            SelectedItem="{Binding SelectedCurrency}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top" Width="auto" Height="auto">
+            --><!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Style.Triggers>
                         <MultiDataTrigger>
@@ -75,27 +84,60 @@
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
-            </ListView.ItemContainerStyle>-->
+            </ListView.ItemContainerStyle>--><!--
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Code}" Width="50">
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Code, UpdateSourceTrigger=PropertyChanged}" Width="auto">
                         <AccessText Text="Код валюты" />
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Abbreviation}" Width="50">
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Abbreviation, UpdateSourceTrigger=PropertyChanged}" Width="auto">
                         <AccessText Text="Буквенный код" />
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Name}" Width="auto">
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_Name, UpdateSourceTrigger=PropertyChanged}" Width="auto">
                         <AccessText Text="Наименование валюты" />
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Cur_DateEnd}" Width="auto">
+                    <GridViewColumn DisplayMemberBinding="{Binding Cur_DateEnd, UpdateSourceTrigger=PropertyChanged}" Width="auto">
                         <AccessText Text="Дата завершения поддержки" />
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
-        </ListView>
+        </ListView>-->
 
-        <lvc:CartesianChart Grid.Column="1" Grid.Row="2"
-                        Margin="5 0 5 5"
+        <ListBox Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Currencies.Result}"
+            SelectedItem="{Binding SelectedCurrency}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5">
+                        <TextBlock FontSize="18" Text="{Binding Path=Cur_Name}" />
+                        <TextBlock Text="{Binding Path=Cur_Code}" />
+                        <TextBlock Text="{Binding Path=Cur_Abbreviation}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged" >
+                    <i:InvokeCommandAction Command="{Binding DrowGridCommand}" CommandParameter="{Binding SelectedCurrency}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+
+        <StackPanel Grid.Column="1" Grid.Row="2" DataContext="{Binding SelectedCurrency}">
+            <TextBlock Text="Код валюты" />
+            <TextBox Margin="5" Text="{Binding Cur_Code, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Буквенный код" />
+            <TextBox Margin="5" Text="{Binding Cur_Abbreviation, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Наименование валюты" />
+            <TextBox Margin="5" Text="{Binding Cur_Name, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Дата завершения поддержки" />
+            <TextBox Margin="5" Text="{Binding Cur_DateEnd, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Vertical" Width="auto" Height="30" Margin="5">
+            <Button Command="{Binding EditCommand}" CommandParameter="{Binding SelectedCurrency}">Применить изменения</Button>
+        </StackPanel>
+
+        <lvc:CartesianChart Grid.Column="2" Grid.Row="2"
+                        Margin="29,19,29,19"
                         DisableAnimations="True">
             <lvc:CartesianChart.Series>
                 <lvc:LineSeries Values="{Binding SelectedCurrencyCurOfficialRate}" />
@@ -107,6 +149,5 @@
                 <lvc:Axis Title="Дни"></lvc:Axis>
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
-
     </Grid>
 </Window>

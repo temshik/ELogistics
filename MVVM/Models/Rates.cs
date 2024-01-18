@@ -30,7 +30,7 @@ namespace MVVM.Models
         [Key]
         [JsonProperty(PropertyName = "Id")]
         public DateTime Date { get; set; }
-        public decimal? Cur_OfficialRate { get; set; }
+        public decimal Cur_OfficialRate { get; set; }
     }
 
 }

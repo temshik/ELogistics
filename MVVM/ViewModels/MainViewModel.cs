@@ -1,5 +1,4 @@
-﻿using bntu.vsrpp.AHotko.Core;
-using LiveCharts;
+﻿using LiveCharts;
 using LiveCharts.Configurations;
 using MVVM.AsyncCommand;
 using MVVM.Helpers;
@@ -8,10 +7,12 @@ using MVVM.Services;
 using MVVM.Writers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using WpfTracker.Helpers;
 
 namespace MVVM.ViewModels
@@ -23,11 +24,14 @@ namespace MVVM.ViewModels
         private readonly IDialogService _dialogService;
         private Currency _selectedCurrency;
         private NotifyTaskCompletion<IList<Currency>> _currencies;
-        private ChartValues<decimal?> _selectedCurrencyCurOfficialRate;
-        private ChartValues<DateTime> _date;
+        private ChartValues<decimal> _selectedCurrencyCurOfficialRate;
+        private ChartValues<DateOnly> _date;
 
         private AsyncCommand<NotifyTaskCompletion<IList<Currency>>> _openCommand;
         private AsyncCommand<Currency> _saveCommand;
+        private AsyncCommand<Currency> _drowGridCommand;
+        private AsyncCommand<Currency> _editCommand;
+
         #endregion
 
         #region properties
@@ -47,44 +51,28 @@ namespace MVVM.ViewModels
             set
             {
                 _selectedCurrency = value;
-                if (_selectedCurrency != null)
-                {
-                    //отображение на графике текущего курса                    
-                    var model = DynamicsCurrencyProcessor.LoadDynamicsCurrency(_selectedCurrency.Cur_ID, DateOnly.ParseExact("31/01/2023", "dd/MM/yyyy"), DateOnly.ParseExact("17/01/2024", "dd/MM/yyyy"));
 
-                    RateShorts = new NotifyTaskCompletion<IList<RateShort>>(model);
-                    if (RateShorts.IsCompleted)
-                    {
-                        SelectedCurrencyCurOfficialRate = new ChartValues<decimal?>(RateShorts.Result.Select(u => (u.Cur_OfficialRate)));
-                        Date = new ChartValues<DateTime>(RateShorts.Result.Select(u => (u.Date)));
-                    }
-                }
-                else
-                {
-                    SelectedCurrencyCurOfficialRate = null;
-                }
                 OnPropertyChanged(nameof(SelectedCurrency));
             }
         }
 
-        public ChartValues<decimal?> SelectedCurrencyCurOfficialRate
+        public ChartValues<decimal> SelectedCurrencyCurOfficialRate
         {
             get { return _selectedCurrencyCurOfficialRate; }
             set
             {
                 _selectedCurrencyCurOfficialRate = value;                
-
-                // color the minimum and maximum points of the selected cur rate graph
+                
                 if (value != null)
                 {
-                    //ColorMinAndMaxPoint();
+                    ColorMinAndMaxPoint();
                 }
 
                 OnPropertyChanged(nameof(SelectedCurrencyCurOfficialRate));
             }
         }
 
-        public ChartValues<DateTime> Date
+        public ChartValues<DateOnly> Date
         {
             get { return _date; }
             set
@@ -100,9 +88,61 @@ namespace MVVM.ViewModels
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
-            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetUsersStatistic());
-            Currencies = new NotifyTaskCompletion<IList<Currency>>(currencies);
+            Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic());
+            //Currencies = new NotifyTaskCompletion <IList<Currency>>(currencies);
         }
+
+        #region drow grid command
+        public AsyncCommand<Currency> DrowGridCommand
+        {
+            get
+            {
+                return _drowGridCommand ??= new AsyncCommand<Currency>(async (currency) =>
+                {
+                    try
+                    {
+                        var model = await DynamicsCurrencyProcessor.LoadDynamicsCurrency(currency.Cur_ID, DateOnly.ParseExact("31/01/2023", "dd/MM/yyyy"), DateOnly.ParseExact("17/01/2024", "dd/MM/yyyy"));
+
+                        SelectedCurrencyCurOfficialRate = new ChartValues<decimal>(model.Select(u => (u.Cur_OfficialRate)));
+                        Date = new ChartValues<DateOnly>(model.Select(u => DateOnly.FromDateTime(u.Date)));                                                
+                    }
+                    catch (Exception ex)
+                    {
+                        _dialogService.ShowMessage(ex.Message);
+                    }
+                });
+            }
+        }
+        #endregion
+
+        #region edit currency command
+        public AsyncCommand<Currency> EditCommand
+        {
+            get
+            {
+                return _editCommand ??= new AsyncCommand<Currency>(async (obj) =>
+                {
+                    try
+                    {
+                        Currency currency = obj as Currency;
+                        if (currency != null) 
+                        {
+                            Currencies.Result.Remove(currency);
+                            Currencies.Result.Add(currency);
+                            SelectedCurrency = currency;
+                        }
+                        //Currencies
+
+                        _dialogService.ShowMessage("Запись изменена");
+                    }
+                    catch (Exception ex)
+                    {
+                        _dialogService.ShowMessage(ex.Message);
+                    }
+                });
+            }
+        }
+        #endregion
 
         #region open files command
         public AsyncCommand<NotifyTaskCompletion<IList<Currency>>> OpenCommand
@@ -115,7 +155,7 @@ namespace MVVM.ViewModels
                     {
                         if (_dialogService.OpenFileDialog() == true)
                         {
-                            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic(_dialogService.FilePaths));
+                            Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic(_dialogService.FilePaths));
                             _dialogService.ShowMessage("Файлы открыты");
                         }
                     }
@@ -147,7 +187,7 @@ namespace MVVM.ViewModels
                                     await new UserXmlWriter(writer).Write(currency);
                                     break;*/
                                 case ".json":
-                                    await new CurrencyJsonWriter(writer).Write(currency);
+                                    await new CurrencyJsonWriter(writer).Write(Currencies.Result);
                                     break;
                                 /*case ".csv":
                                     await new UserCsvWriter(writer).Write(currency);
@@ -174,11 +214,11 @@ namespace MVVM.ViewModels
         {
             var mapper = new CartesianMapper<int>()
                 .X((value, index) => index)
-                .Y(value => value);
-                /*.Fill((value, index) =>
-                value == SelectedUser?.TheBestResult ?
-                    Brushes.Green : value == SelectedUser?.TheWorstResult ?
-                        Brushes.Red : null);*/
+                .Y(value => value)
+                .Fill((value, index) =>
+                value == SelectedCurrencyCurOfficialRate.Max() ?
+                    Brushes.Red : value == SelectedCurrencyCurOfficialRate.Min() ?
+                    Brushes.Green : null);
             LiveCharts.Charting.For<int>(mapper, SeriesOrientation.Horizontal);
         }
         #endregion

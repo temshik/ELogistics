@@ -9,7 +9,7 @@ namespace MVVM.Services
     /// </summary>
     public interface IFileService
     {
-/*        /// <summary>
+        /// <summary>
         /// Get all currency statictic.
         /// </summary>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
@@ -20,6 +20,6 @@ namespace MVVM.Services
         /// </summary>
         /// <param name="files">Files.</param>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
-        public Task<IList<Currency>> GetCurrencyStatistic(string[] files);*/
+        public Task<IList<Currency>> GetCurrencyStatistic(string[] files);
     }
 }

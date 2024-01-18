@@ -27,66 +27,32 @@ namespace MVVM.Services
         /// Get all Currency statictic.
         /// </summary>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
-        /*public async Task<IList<Currency>> GetCurrencyStatistic()
+        public async Task<IList<Currency>> GetCurrencyStatistic()
         {
             var allStatistic = await _fileReader.ReadDirectory();
-            return GetUsers(allStatistic);
-        }*/
+            return GetCurrency(allStatistic);
+        }
 
         /// <summary>
         /// Get all Currency statictic.
         /// </summary>
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
-        /*public async Task<IList<Currency>> GetCurrencyStatistic(string[] files)
+        public async Task<IList<Currency>> GetCurrencyStatistic(string[] files)
         {
             var allStatistic = await _fileReader.ReadFiles(files);
-            return GetUsers(allStatistic);
-        }*/
-
-        private static IList<Currency> GetCurrency(IDictionary<int, IList<Currency>> allStatistic)
-        {
-            var users = new List<Currency>();
-
-            var usersData = new List<Currency>();
-
- /*           foreach (var day in allStatistic)
-            {
-                foreach (Currency data in day.Value)
-                {
-                    var existedUsers = users.Where(u => u.UserName == data.User).ToList();
-                    User user = null;
-                    if (existedUsers.Count == 0)
-                    {
-                        user = new User
-                        {
-                            UserName = data.User,
-                            UserData = new Dictionary<int, Currency>()
-                        };
-                        user.UserData.Add(day.Key, data);
-                        users.Add(user);
-                    }
-                    else
-                    {
-                        user = existedUsers[0];
-                        user.UserData.Add(day.Key, data);
-                    }
-                }
-            }*/
-
-            //GetTheAverageMaximumAndMinimumResults(users);
-
-            return users;
+            return GetCurrency(allStatistic);
         }
 
-/*        private static void GetTheAverageMaximumAndMinimumResults(List<Currency> users)
+        private static IList<Currency> GetCurrency(IList<Currency> allStatistic)
         {
-            foreach (var user in users)
+            var currencies = new List<Currency>();
+
+            foreach (var day in allStatistic)
             {
-                var steps = user.UserData.Select(u => u.Value.Steps);
-                user.AverageStepsNumber = (int)steps.Average();
-                user.TheBestResult = steps.Max();
-                user.TheWorstResult = steps.Min();
+
             }
-        }*/
+
+            return allStatistic;
+        }
     }
 }

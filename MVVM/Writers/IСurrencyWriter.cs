@@ -1,4 +1,5 @@
 ﻿using MVVM.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MVVM.Writers
@@ -13,6 +14,6 @@ namespace MVVM.Writers
         /// </summary>
         /// <param name="сurrency">The сurrency informtion.</param>
         /// <returns>A <see cref="Task">.</returns>
-        Task Write(Currency сurrency);
+        Task Write(IList<Currency> сurrency);
     }
 }

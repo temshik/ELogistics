@@ -1,6 +1,7 @@
 ﻿using MVVM.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace MVVM.Writers
         }
 
         /// <inheritdoc/>
-        public async Task Write(Currency сurrency)
+        public async Task Write(IList<Currency> сurrency)
         {
             JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(_writer, сurrency);
