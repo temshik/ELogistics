@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
 namespace MVVM.Models
 {

@@ -1,7 +1,6 @@
 ﻿using MVVM.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -10,13 +9,20 @@ namespace MVVM.Helpers
 {
     public class DynamicsCurrencyProcessor
     {
-        //по мимо того, что надо проверять дату исключения валюты из перечня валют, к которым устанавливается официальный курс бел. рубля
-        //так ещё и надо проверять количество единиц иностранной валюты к которой привязан курс 
-        //наименования, количества единиц к которому устанавливается курс белорусского рубля, буквенного, цифрового кодов 
+
+        /// <summary>
+        /// по мимо того, что надо проверять дату исключения валюты из перечня валют, к которым устанавливается официальный курс бел. рубля
+        /// так ещё и надо проверять количество единиц иностранной валюты к которой привязан курс
+        /// наименования, количества единиц к которому устанавливается курс белорусского рубля, буквенного, цифрового кодов
+        /// </summary>
+        /// <param name="curId">Currency Id</param>
+        /// <param name="start">By default one year ago</param>
+        /// <param name="end">By default today</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static async Task<IList<RateShort>> LoadDynamicsCurrency(int curId, DateOnly? start, DateOnly? end)
         {
-            string url = $"https://api.nbrb.by/ExRates/Rates/Dynamics/{curId}?startDate={start.Value.ToString("yyyy-MM-dd")}&endDate={end.Value.ToString("yyyy-MM-dd")}";
-            //string url = "https://api.nbrb.by/exrates/rates/dynamics/431?startDate=2021-07-09&endDate=2022-09-12";
+            string url = $"/ExRates/Rates/Dynamics/{curId}?startDate={start.Value.ToString("yyyy-MM-dd")}&endDate={end.Value.ToString("yyyy-MM-dd")}";
 
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {

@@ -29,8 +29,7 @@ namespace MVVM.Services
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
         public async Task<IList<Currency>> GetCurrencyStatistic()
         {
-            var allStatistic = await _fileReader.ReadDirectory();
-            return GetCurrency(allStatistic);
+            return await _fileReader.ReadDirectory();
         }
 
         /// <summary>
@@ -39,20 +38,7 @@ namespace MVVM.Services
         /// <returns>A <see cref="Task{IList{Currency}}".</returns>
         public async Task<IList<Currency>> GetCurrencyStatistic(string[] files)
         {
-            var allStatistic = await _fileReader.ReadFiles(files);
-            return GetCurrency(allStatistic);
-        }
-
-        private static IList<Currency> GetCurrency(IList<Currency> allStatistic)
-        {
-            var currencies = new List<Currency>();
-
-            foreach (var day in allStatistic)
-            {
-
-            }
-
-            return allStatistic;
+            return await _fileReader.ReadFiles(files);
         }
     }
 }

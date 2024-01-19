@@ -1,9 +1,6 @@
 ﻿using MVVM.Helpers;
-using MVVM.Models;
 using MVVM.Services;
 using MVVM.ViewModels;
-using System;
-using System.Linq;
 using System.Windows;
 
 namespace MVVM
@@ -13,10 +10,10 @@ namespace MVVM
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(IFileService fileService, IDialogService dialogService)
+        public MainWindow(IFileService fileService, IDialogService dialogService, string baseUrl)
         {
             InitializeComponent();
-            ApiHelper.InitializeClient();
+            ApiHelper.InitializeClient(baseUrl);
 
             DataContext = new MainViewModel(fileService, dialogService, CurrencyProcessor.LoadCurrencies());
         }

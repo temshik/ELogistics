@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MVVM.ErrorHandler;
+using System;
 using System.Threading.Tasks;
-using MVVM.ErrorHandler;
 
 namespace MVVM.AsyncCommand
 {

@@ -12,8 +12,8 @@ namespace MVVM.Helpers
     {
         public static async Task<IList<Currency>> LoadCurrencies()
         {
-            string url = "https://api.nbrb.by/exrates/currencies";          
-            
+            string url = "/exrates/currencies";
+
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {
                 if (response.IsSuccessStatusCode)

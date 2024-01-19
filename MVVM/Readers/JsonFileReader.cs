@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MVVM.Readers
@@ -26,7 +25,7 @@ namespace MVVM.Readers
         public JsonFileReader(IErrorHandler errorHandler, string directory)
         {
             _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
-            _directory = directory ?? throw new ArgumentNullException(nameof(directory));
+            _directory = directory;// ?? throw new ArgumentNullException(nameof(directory));
         }
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace MVVM.Readers
         {
             var allStatistic = new List<Currency>();
             foreach (string fileName in files)
-            { 
+            {
                 try
                 {
                     var dayStatistic = await ReadFile(fileName);

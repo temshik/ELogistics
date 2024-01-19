@@ -1,3 +1,4 @@
 {
-  "Directory": "D:\\VisualStudio\\MVVM\\MVVM\\TestData"
+  "Directory": "D:\\VisualStudio\\MVVM\\MVVM\\TestData",
+  "BaseUrl": "https://api.nbrb.by"
 }

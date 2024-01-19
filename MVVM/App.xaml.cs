@@ -29,12 +29,13 @@ namespace MVVM
             IConfiguration configuration = builder.Build();
             // The default directory for the initial download of files.
             string directory = configuration.GetSection("Directory").Value;
+            string baseUrl = configuration.GetSection("BaseUrl").Value;
 
             services.AddSingleton<IErrorHandler>(provider => new DefaultErrorHandler());
             services.AddTransient<IFileReader>(provider => new JsonFileReader(new DefaultErrorHandler(), directory));
             services.AddTransient<IDialogService>(provider => new DefaultDialogService());
             services.AddTransient<IFileService>(provider => new JsonFileService(new JsonFileReader(new DefaultErrorHandler(), directory)));
-            services.AddSingleton<MainWindow>();
+            services.AddSingleton(new MainWindow(new JsonFileService(new JsonFileReader(new DefaultErrorHandler(), directory)), new DefaultDialogService(), baseUrl));
         }
 
         private void App_OnStartup(object sender, StartupEventArgs e)

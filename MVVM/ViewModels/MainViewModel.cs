@@ -34,13 +34,6 @@ namespace MVVM.ViewModels
 
         #endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
-
         #region properties
         public NotifyTaskCompletion<IList<Currency>> Currencies
         {
@@ -68,8 +61,8 @@ namespace MVVM.ViewModels
             get { return _selectedCurrencyCurOfficialRate; }
             set
             {
-                _selectedCurrencyCurOfficialRate = value;                
-                
+                _selectedCurrencyCurOfficialRate = value;
+
                 if (value != null)
                 {
                     ColorMinAndMaxPoint();
@@ -95,8 +88,7 @@ namespace MVVM.ViewModels
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
-            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic());
-            Currencies = new NotifyTaskCompletion <IList<Currency>>(currencies);
+            Currencies = new NotifyTaskCompletion<IList<Currency>>(currencies);
         }
 
         #region drow grid command
@@ -111,7 +103,7 @@ namespace MVVM.ViewModels
                         var model = await DynamicsCurrencyProcessor.LoadDynamicsCurrency(currency.Cur_ID, DateOnly.ParseExact("01/01/2024", "dd/MM/yyyy"), DateOnly.ParseExact("19/01/2024", "dd/MM/yyyy"));
 
                         SelectedCurrencyCurOfficialRate = new ChartValues<decimal>(model.Select(u => (u.Cur_OfficialRate)));
-                        Date = new ChartValues<DateOnly>(model.Select(u => DateOnly.FromDateTime(u.Date)));                                                
+                        Date = new ChartValues<DateOnly>(model.Select(u => DateOnly.FromDateTime(u.Date)));
                     }
                     catch (Exception ex)
                     {
@@ -132,7 +124,7 @@ namespace MVVM.ViewModels
                     try
                     {
                         Currency currency = obj as Currency;
-                        if (currency != null) 
+                        if (currency != null)
                         {
                             Currencies.Result.Remove(currency);
                             Currencies.Result.Add(currency);
@@ -190,15 +182,15 @@ namespace MVVM.ViewModels
                             using StreamWriter writer = new StreamWriter(File.Create(_dialogService.FilePath));
                             switch (fileExtension)
                             {
-                                /*case ".xml":
-                                    await new UserXmlWriter(writer).Write(currency);
-                                    break;*/
+                                case ".xml":
+                                    await new СurrencyXmlWriter(writer).Write(Currencies.Result);
+                                    break;
                                 case ".json":
                                     await new CurrencyJsonWriter(writer).Write(Currencies.Result);
                                     break;
-                                /*case ".csv":
-                                    await new UserCsvWriter(writer).Write(currency);
-                                    break;*/
+                                case ".csv":
+                                    await new СurrencyCsvWriter(writer).Write(Currencies.Result);
+                                    break;
                                 default:
                                     throw new FileFormatException("Неподдерживаемый формат файла");
                             }
@@ -229,6 +221,12 @@ namespace MVVM.ViewModels
             LiveCharts.Charting.For<int>(mapper, SeriesOrientation.Horizontal);
         }
         #endregion
-        
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
     }
 }
