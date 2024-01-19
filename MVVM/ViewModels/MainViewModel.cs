@@ -17,7 +17,7 @@ using WpfTracker.Helpers;
 
 namespace MVVM.ViewModels
 {
-    public class MainViewModel : BaseVM
+    public class MainViewModel : INotifyPropertyChanged
     {
         #region private fields
         private readonly IFileService _fileService;
@@ -33,6 +33,13 @@ namespace MVVM.ViewModels
         private AsyncCommand<Currency> _editCommand;
 
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
 
         #region properties
         public NotifyTaskCompletion<IList<Currency>> Currencies
@@ -88,8 +95,8 @@ namespace MVVM.ViewModels
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
-            Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic());
-            //Currencies = new NotifyTaskCompletion <IList<Currency>>(currencies);
+            //Currencies = new NotifyTaskCompletion<IList<Currency>>(_fileService.GetCurrencyStatistic());
+            Currencies = new NotifyTaskCompletion <IList<Currency>>(currencies);
         }
 
         #region drow grid command
@@ -101,7 +108,7 @@ namespace MVVM.ViewModels
                 {
                     try
                     {
-                        var model = await DynamicsCurrencyProcessor.LoadDynamicsCurrency(currency.Cur_ID, DateOnly.ParseExact("31/01/2023", "dd/MM/yyyy"), DateOnly.ParseExact("17/01/2024", "dd/MM/yyyy"));
+                        var model = await DynamicsCurrencyProcessor.LoadDynamicsCurrency(currency.Cur_ID, DateOnly.ParseExact("01/01/2024", "dd/MM/yyyy"), DateOnly.ParseExact("19/01/2024", "dd/MM/yyyy"));
 
                         SelectedCurrencyCurOfficialRate = new ChartValues<decimal>(model.Select(u => (u.Cur_OfficialRate)));
                         Date = new ChartValues<DateOnly>(model.Select(u => DateOnly.FromDateTime(u.Date)));                                                
@@ -222,5 +229,6 @@ namespace MVVM.ViewModels
             LiveCharts.Charting.For<int>(mapper, SeriesOrientation.Horizontal);
         }
         #endregion
+        
     }
 }

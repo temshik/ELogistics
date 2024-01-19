@@ -26,7 +26,7 @@ namespace MVVM.Readers
         public JsonFileReader(IErrorHandler errorHandler, string directory)
         {
             _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
-            _directory = directory;// ?? throw new ArgumentNullException(nameof(directory));
+            _directory = directory ?? throw new ArgumentNullException(nameof(directory));
         }
 
         /// <summary>
